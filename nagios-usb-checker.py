@@ -5,7 +5,7 @@ import optparse
 import simplejson,urllib
 
 __author__ = 'Meir Finkelstine'
-__version__= '0.6'
+__version__= '0.7'
 #
 #
 # 0.5 adding check for printing comments or not
@@ -18,21 +18,10 @@ debug = False
 # 2     CRITICAL
 # 3     UNKNOWN
 
-# Need To Check Value ===================================
-# information_module  = ON-LINE || OFFLINE || SELF_TEST
-# iformation_upstemp = 29N 30 W 35 C        upsTemp
-#
-# input_voltage                 = 223N w 235C       inVolt
-# input_freq                    = 55W  60C          inFreq
-#
-# output_voltage                = 235N 235W 240C    outVolt
-# output_freq               = 55W  60C          outFreq
-# output_load                   = 30N 31-40W 40C    loadPercent
-# 
-# battery_voltage    = 50-40N 39-25W 24C    batV
-# battery_capacity   = 100-70N 69-30W 29-0C batCapacity
 
 j = []
+
+#j = json.loads('{"inVolt":"179.4V","model":"ON-LINE", "upsTemp":"25.9C","status":"Normal","inFreq":"49.9Hz","outVolt":"229.9V","outFreq":"49.9Hz","loadPercent":"0%","batV":"40.8V","batCapacity":"100%"}')
 
 def get_num(x):
     if debug : print "value %s" %x
@@ -43,7 +32,7 @@ def main():
     import json
     """ Main plugin """
     ( host, dev, port, comments ) = parse_args()
-    #jsonUrl = 'http://%s:%s/0?json' %(host,port)
+    jsonUrl = 'http://%s:%s/0?json' %(host,port)
     url = 'http://%s:%s/0?json' %(host,port)
 
     try :
@@ -52,7 +41,6 @@ def main():
         print "CRITICAL - Host %s is OFFLINE" %host
         sys.exit(2)
 
-    #j = json.dumps(j1)
     if debug :    print "host %s \ndevice %s \nurl %s \njson data \n\n %s" %(host, dev, jsonUrl,j )
 
     if dev == "model":
@@ -62,7 +50,7 @@ def main():
         if debug : print "you have choosed upstemp = %s jsonValue %s" %(dev, j['upsTemp'])
         iformation_upstemp(j['upsTemp'],comments)
     elif dev == "ivoltage":
-        if debug : print "you have choosed ivoltage = %s jsonValue %s" %(dev, j['inVolt'])
+        if debug : print "you have choosed ivoltage = %s jsonValue %s" %(dev,j['inVolt'])
         input_voltage(j['inVolt'],comments)
     elif dev == "ifreq":
         if debug : print "you have choosed ifreq = %s jsonValue %s" %(dev, j['inFreq'])
@@ -86,8 +74,6 @@ def main():
         print "you have choosed unknown device = %s" %dev
 
 def information_module(module,comments):
-#    module = j["model"]
-    # ON-LINE || OFFLINE || SELF_TEST
     if module == "ON-LINE":
         print "OK - module status is %s|'module status is'=%s " %( module, module)
         sys.exit(0)
@@ -124,7 +110,7 @@ def iformation_upstemp(upstemp,comments):
             
     elif int(upstemp) > 35:
         if comments:
-            print "CRITICAL - UPS Temperture is %s comments %s | 'UPS Temperture is'=%s|'UPS Temperture is'=%s" %(upstemp,comments,upstemp)
+            print "CRITICAL - UPS Temperture is %s comments %s | 'UPS Temperture is'=%s" %(upstemp,comments,upstemp)
         else:
             print "CRITICAL - UPS Temperture is %s |'UPS Temperture is'=%s" %(upstemp,upstemp)
         sys.exit(2)
@@ -133,20 +119,18 @@ def iformation_upstemp(upstemp,comments):
         sys.exit(3)
 
 def input_voltage(inputVoltage,comments):
-    # output_voltage            = 235N 235W 240C    outVolt
-    #input_voltage = get_num(j['inVolt'])
+
     input_voltage = get_num(inputVoltage)
-    if int(input_voltage) <= 223 and int(input_voltage) <= 235:
+    if int(input_voltage) >= 223 and int(input_voltage) <= 240 :
         print "OK - Input Voltage is %s|'Input Voltage is'=%s" %( input_voltage,input_voltage)
         sys.exit(0)
-    #elif input_voltage  > "236" and input_voltage <= "240" :
-    elif int(input_voltage)  <= 236 and int(input_voltage) <= 240:
+    elif int(input_voltage)  >= 241 and int(input_voltage) <= 260 or int(input_voltage) < 180:
         if comments:
             print "WARNING - Input Voltage is %s comments %s | 'Input Voltage is'=%s" %(input_voltage,comments,input_voltage)
         else:
-            print "WARNING - Input Voltage is %s | 'Input Voltage is'= " %(input_voltage,input_voltage)
+            print "WARNING - Input Voltage is %s | 'Input Voltage is'=%s " %(input_voltage,input_voltage)
         sys.exit(1)
-    elif int(input_voltage) >= 240 :
+    elif int(input_voltage) >= 261 or int(input_voltage) <= 200 :
         if comments:
             print "CRITICAL - Input Voltage is %s comments %s | 'Input Voltage is'=%s" %(input_voltage,comments,input_voltage)
         else:
@@ -181,8 +165,6 @@ def input_freq(inputFreq,comments):
         sys.exit(3)
 
 def output_voltage(outVoltage,comments):
-    # output_voltage            = 235N 235W 240C    outVolt
-    #output_voltage = get_num(j['outVolt'])
     output_voltage = get_num(outVoltage)
     if int(output_voltage) < 235:
         print "OK - Output Voltage is %s|'Output Voltage is'=%s" %(output_voltage,output_voltage)
@@ -316,8 +298,7 @@ def parse_args():
     parser.add_option("-p", "--port", dest="port",type="int", help="Enter Remote Port Number", default=8888)
     parser.add_option("-c", "--comment", dest="comments", type="string", help="Add Comments to display on Warnings/Critical Messages")
     (options, args) = parser.parse_args()
-    #if len(args) != 2:
-    #    parser.error("incorrect number of arguments")
+
     if ( options.hostname is None )  or ( options.device is None ) :
         parser.error("incorrect number of arguments")
     return options.hostname, options.device, options.port, options.comments

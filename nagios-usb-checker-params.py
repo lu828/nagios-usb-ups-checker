@@ -33,6 +33,10 @@ debug = False
 
 j = []
 
+value = '{
+        "inVolt": 220
+     }'
+
 def get_num(x):
     if debug : print "value %s" %x
     return float(''.join(ele for ele in x if ele.isdigit() or ele == '.'))
@@ -45,13 +49,13 @@ def main():
 
     import urllib2
     import json
-    req = urllib2.Request(jsonUrl)
-    opener = urllib2.build_opener()
-    try :
-        j = simplejson.load(urllib.urlopen(url))
-    except:
-        print "CRITICAL - Host %s is OFFLINE" %host
-        sys.exit(2)
+    #req = urllib2.Request(jsonUrl)
+    #opener = urllib2.build_opener()
+    #try :
+        #j = simplejson.load(urllib.urlopen(url))
+    #except:
+    #    print "CRITICAL - Host %s is OFFLINE" %host
+    #    sys.exit(2)
 
     #j = json.dumps(j1)
     if debug :    print "host %s \ndevice %s \nurl %s \njson data \n\n %s" %(host, dev, jsonUrl,j )
