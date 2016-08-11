@@ -4,6 +4,7 @@ import re,sys,commands,os
 import optparse
 import urllib2
 import simplejson,urllib
+import socket
 
 __author__ = 'Meir Finkelstine'
 __version__= '0.8'
@@ -31,13 +32,7 @@ def get_num(x):
     return float(''.join(ele for ele in x if ele.isdigit() or ele == '.'))
 
 def checkAlive(host,port):
-    import socket
-    
-    import subprocess
-    from platform import system
-    
-    r = ""
-    os = system()
+
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         s.connect((host, port))
@@ -46,7 +41,7 @@ def checkAlive(host,port):
             print "Success connecting to "
             print host + " on port: " + str(port)
     except:
-        print "CRITICAL - Host %s IP is ping OFFLINE" %host
+        print "CRITICAL - Host %s OFFLINE unable to open socket" %host
         sys.exit(2) 
 
 
@@ -59,7 +54,7 @@ def main():
     url = 'http://%s:%s/0?json' %(host,port)
     
     checkAlive(host,port)
-    
+
     try :
         j = simplejson.load(urllib.urlopen(url))
     except:
