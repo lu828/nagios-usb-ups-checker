@@ -34,6 +34,7 @@ def get_num(x):
 def checkAlive(host,port):
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(0.5)
     try:
         s.connect((host, port))
         s.shutdown(2)
