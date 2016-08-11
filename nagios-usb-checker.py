@@ -1,15 +1,17 @@
 #!/usr/bin/python
 import json
-import re,sys,commands
+import re,sys,commands,os
 import optparse
+import urllib2
 import simplejson,urllib
 
 __author__ = 'Meir Finkelstine'
-__version__= '0.7'
+__version__= '0.8'
 #
 #
 # 0.5 adding check for printing comments or not
-# 0.6 adding graph results 
+# 0.6 adding graph results
+# 0.8 adding host check alive  
 
 debug = False
 #Exit Code      Status
@@ -24,21 +26,44 @@ j = []
 #j = json.loads('{"inVolt":"179.4V","model":"ON-LINE", "upsTemp":"25.9C","status":"Normal","inFreq":"49.9Hz","outVolt":"229.9V","outFreq":"49.9Hz","loadPercent":"0%","batV":"40.8V","batCapacity":"100%"}')
 
 def get_num(x):
+    
     if debug : print "value %s" %x
     return float(''.join(ele for ele in x if ele.isdigit() or ele == '.'))
 
+def checkAlive(host,port):
+    import socket
+    
+    import subprocess
+    from platform import system
+    
+    r = ""
+    os = system()
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.connect((host, port))
+        s.shutdown(2)
+        if debug :
+            print "Success connecting to "
+            print host + " on port: " + str(port)
+    except:
+        print "CRITICAL - Host %s IP is ping OFFLINE" %host
+        sys.exit(2) 
+
+
 def main():
-    import urllib2
-    import json
+    
+    #import json
     """ Main plugin """
     ( host, dev, port, comments ) = parse_args()
     jsonUrl = 'http://%s:%s/0?json' %(host,port)
     url = 'http://%s:%s/0?json' %(host,port)
-
+    
+    checkAlive(host,port)
+    
     try :
         j = simplejson.load(urllib.urlopen(url))
     except:
-        print "CRITICAL - Host %s is OFFLINE" %host
+        print "CRITICAL - %s Unable to retrive json file " %host
         sys.exit(2)
 
     if debug :    print "host %s \ndevice %s \nurl %s \njson data \n\n %s" %(host, dev, jsonUrl,j )
