@@ -34,7 +34,7 @@ def get_num(x):
 def checkAlive(host,port):
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.settimeout(0.5)
+    s.settimeout(1)
     try:
         s.connect((host, port))
         s.shutdown(2)
@@ -142,7 +142,7 @@ def iformation_upstemp(upstemp,comments):
 def input_voltage(inputVoltage,comments):
 
     input_voltage = get_num(inputVoltage)
-    if int(input_voltage) >= 223 and int(input_voltage) <= 240 :
+    if int(input_voltage) >= 210 and int(input_voltage) <= 240 :
         print "OK - Input Voltage is %s|'Input Voltage is'=%s" %( input_voltage,input_voltage)
         sys.exit(0)
     elif int(input_voltage)  >= 241 and int(input_voltage) <= 260 or int(input_voltage) < 180:
@@ -323,8 +323,6 @@ def parse_args():
     if ( options.hostname is None )  or ( options.device is None ) :
         parser.error("incorrect number of arguments")
     return options.hostname, options.device, options.port, options.comments
-
-
 
 
 if __name__ == '__main__':
