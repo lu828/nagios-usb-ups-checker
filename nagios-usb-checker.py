@@ -7,7 +7,7 @@ import simplejson,urllib
 import socket
 
 __author__ = 'Meir Finkelstine'
-__version__= '0.8'
+__version__= '0.9'
 #
 #
 # 0.5 adding check for printing comments or not
@@ -34,7 +34,7 @@ def get_num(x):
 def checkAlive(host,port):
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.settimeout(1)
+    s.settimeout(1.5) 
     try:
         s.connect((host, port))
         s.shutdown(2)
@@ -51,7 +51,7 @@ def main():
     #import json
     """ Main plugin """
     ( host, dev, port, comments ) = parse_args()
-    jsonUrl = 'http://%s:%s/0?json' %(host,port)
+#    jsonUrl = 'http://%s:%s/0?json' %(host,port)
     url = 'http://%s:%s/0?json' %(host,port)
     
     checkAlive(host,port)
@@ -59,10 +59,10 @@ def main():
     try :
         j = simplejson.load(urllib.urlopen(url))
     except:
-        print "CRITICAL - %s Unable to retrive json file " %host
+	print "CRITICAL - %s Unable to retrive json file " %host
         sys.exit(2)
 
-    if debug :    print "host %s \ndevice %s \nurl %s \njson data \n\n %s" %(host, dev, jsonUrl,j )
+    if debug :    print "host %s \ndevice %s \nurl %s \njson data \n\n %s" %(host, dev, url,j )
 
     if dev == "model":
         if debug : print "you have choosed module = %s jsonValue %s" %(dev, j['model'])
@@ -117,19 +117,18 @@ def information_module(module,comments):
 def iformation_upstemp(upstemp,comments):
     # iformation_upstemp = 29N 35 W 35 C
 
-    #upstemp = get_num(j['upsTemp'])
     upstemp = get_num(upstemp)
-    if int(upstemp) < 29 and int(upstemp) <= 34:
+    if int(upstemp) >= 0 and int(upstemp) <= 54.9:
         print "OK - UPS Temperture is %s|'UPS Temperture is'=%s" %(upstemp,upstemp)
         sys.exit(0)
-    elif int(upstemp)  <= 35:
+    elif int(upstemp)  >= 55 and int(upstemp) <= 59.9:
         if comments:
             print "WARNING - UPS Temperture is %s comments %s |'UPS Temperture is'=%s" %(upstemp,comments,upstemp)
         else:
             print "WARNING - UPS Temperture is %s|'UPS Temperture is'=%s" %(upstemp,upstemp)
         sys.exit(1)
             
-    elif int(upstemp) > 35:
+    elif int(upstemp) > 60:
         if comments:
             print "CRITICAL - UPS Temperture is %s comments %s | 'UPS Temperture is'=%s" %(upstemp,comments,upstemp)
         else:
@@ -142,7 +141,7 @@ def iformation_upstemp(upstemp,comments):
 def input_voltage(inputVoltage,comments):
 
     input_voltage = get_num(inputVoltage)
-    if int(input_voltage) >= 210 and int(input_voltage) <= 240 :
+    if int(input_voltage) >= 200 and int(input_voltage) <= 240 :
         print "OK - Input Voltage is %s|'Input Voltage is'=%s" %( input_voltage,input_voltage)
         sys.exit(0)
     elif int(input_voltage)  >= 241 and int(input_voltage) <= 260 or int(input_voltage) < 180:
@@ -325,5 +324,8 @@ def parse_args():
     return options.hostname, options.device, options.port, options.comments
 
 
+
+
 if __name__ == '__main__':
     main()
+
