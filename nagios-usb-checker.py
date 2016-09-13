@@ -24,7 +24,7 @@ debug = False
 
 j = []
 
-#j = json.loads('{"inVolt":"179.4V","model":"ON-LINE", "upsTemp":"25.9C","status":"Normal","inFreq":"49.9Hz","outVolt":"229.9V","outFreq":"49.9Hz","loadPercent":"0%","batV":"40.8V","batCapacity":"100%"}')
+j = json.loads('{"inVolt":"179.4V","model":"ON-LINE", "upsTemp":"25.9C","status":"Normal","inFreq":"49.9Hz","outVolt":"229.9V","outFreq":"49.9Hz","loadPercent":"0%","batV":"40.8V","batCapacity":"100%"}')
 
 def get_num(x):
     
@@ -54,13 +54,13 @@ def main():
 #    jsonUrl = 'http://%s:%s/0?json' %(host,port)
     url = 'http://%s:%s/0?json' %(host,port)
     
-    checkAlive(host,port)
+    #checkAlive(host,port)
 
-    try :
-        j = simplejson.load(urllib.urlopen(url))
-    except:
-	print "CRITICAL - %s Unable to retrive json file " %host
-        sys.exit(2)
+    #try :
+    #    j = simplejson.load(urllib.urlopen(url))
+    #except:
+	#    print "CRITICAL - %s Unable to retrive json file " %host
+        #sys.exit(2)
 
     if debug :    print "host %s \ndevice %s \nurl %s \njson data \n\n %s" %(host, dev, url,j )
 
@@ -140,17 +140,19 @@ def iformation_upstemp(upstemp,comments):
 
 def input_voltage(inputVoltage,comments):
 
-    input_voltage = get_num(inputVoltage)
+    #input_voltage = get_num(inputVoltage)
+    input_voltage = get_num("200.9")
+    print "input value %s" %input_voltage
     if int(input_voltage) >= 200 and int(input_voltage) <= 240 :
         print "OK - Input Voltage is %s|'Input Voltage is'=%s" %( input_voltage,input_voltage)
         sys.exit(0)
-    elif int(input_voltage)  >= 241 and int(input_voltage) <= 260 or int(input_voltage) < 180:
+    elif int(input_voltage) >= 180 and int(input_voltage) <= 199:
         if comments:
             print "WARNING - Input Voltage is %s comments %s | 'Input Voltage is'=%s" %(input_voltage,comments,input_voltage)
         else:
             print "WARNING - Input Voltage is %s | 'Input Voltage is'=%s " %(input_voltage,input_voltage)
         sys.exit(1)
-    elif int(input_voltage) >= 261 or int(input_voltage) <= 200 :
+    elif int(input_voltage) >= 0 and int(input_voltage) <= 179:
         if comments:
             print "CRITICAL - Input Voltage is %s comments %s | 'Input Voltage is'=%s" %(input_voltage,comments,input_voltage)
         else:
