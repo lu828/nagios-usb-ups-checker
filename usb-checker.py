@@ -7,7 +7,7 @@ import simplejson,urllib
 import socket
 
 __author__ = 'Meir Finkelstine'
-__version__= '0.9'
+__version__= '0.8'
 #
 #
 # 0.5 adding check for printing comments or not
@@ -24,7 +24,7 @@ debug = False
 
 j = []
 
-j = json.loads('{"inVolt":"179.4V","model":"ON-LINE", "upsTemp":"25.9C","status":"Normal","inFreq":"49.9Hz","outVolt":"229.9V","outFreq":"49.9Hz","loadPercent":"0%","batV":"40.8V","batCapacity":"100%"}')
+#j = json.loads('{"inVolt":"179.4V","model":"ON-LINE", "upsTemp":"25.9C","status":"Normal","inFreq":"49.9Hz","outVolt":"229.9V","outFreq":"49.9Hz","loadPercent":"0%","batV":"40.8V","batCapacity":"100%"}')
 
 def get_num(x):
     
@@ -51,6 +51,7 @@ def main():
     ( host, dev, port, comments ) = parse_args()
 
     url = 'http://%s:%s/0?json' %(host,port)
+    
     checkAlive(host,port)
 
     try :
