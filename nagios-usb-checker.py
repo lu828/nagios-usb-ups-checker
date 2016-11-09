@@ -5,7 +5,7 @@ import optparse
 import urllib2
 import simplejson,urllib
 import socket
-
+#from swf.movie import SWF
 __author__ = 'Meir Finkelstine'
 __version__= '0.9'
 #
@@ -32,7 +32,7 @@ def get_num(x):
     return float(''.join(ele for ele in x if ele.isdigit() or ele == '.'))
 
 def checkAlive(host,port):
-
+    status = ""
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(1.5) 
     try:
@@ -42,22 +42,47 @@ def checkAlive(host,port):
             print "Success connecting to "
             print host + " on port: " + str(port)
     except:
-        print "CRITICAL - Host %s OFFLINE unable to open socket" %host
-        sys.exit(2) 
+        msgA =  "CRITICAL - Host %s OFFLINE unable to open socket" %host
+        #sys.exit(2)
+        pass
+     
 
 
 def main():
     """ Main plugin """
     ( host, dev, port, comments ) = parse_args()
+    port = 15178
+
+    
 
     url = 'http://%s:%s/0?json' %(host,port)
+    usbUrls = {
+        'oldVP' : 'http://%s:%s/0?json',
+        'newVP' : 'http://%s:%s/ViewPower/#'
+    }
+
+    if port != 15178 : 
+        print "oldVP"
+        url = usbUrls['oldVP'] %(host,port )
+    else:
+        print "newVP"
+        url = usbUrls['newVP'] %(host,port )
+    
     checkAlive(host,port)
 
-    try :
-        j = simplejson.load(urllib.urlopen(url))
-    except:
-	    print "CRITICAL - %s Unable to retrive json file " %host
-        sys.exit(2)
+    #print rls['oldVP'] %(host,port )
+    print url   
+    checkAlive(host,port)
+    
+    if port != 15178 : 
+        try :
+            j = simplejson.load(urllib.urlopen(url))
+        except:
+            print "CRITICAL - %s Unable to retrive json file " %host
+            sys.exit(2)
+    
+
+    sys.exit(4)
 
     if debug :    print "host %s \ndevice %s \nurl %s \njson data \n\n %s" %(host, dev, url,j )
 
@@ -320,6 +345,8 @@ def parse_args():
     return options.hostname, options.device, options.port, options.comments
 
 
+def openLocalLogFile(file):
+    print "opening log file"
 
 
 if __name__ == '__main__':
