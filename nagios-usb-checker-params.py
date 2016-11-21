@@ -91,8 +91,6 @@ def main():
         print "you have choosed unknown device = %s" %dev
 
 def information_module(module,comments):
-#    module = j["model"]
-    # ON-LINE || OFFLINE || SELF_TEST
     if module == "ON-LINE":
         print "OK - module status is %s" % module
         sys.exit(0)
